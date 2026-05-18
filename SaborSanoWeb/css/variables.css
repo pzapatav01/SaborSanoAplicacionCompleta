@@ -1,0 +1,50 @@
+/* ============================================
+   VARIABLES - Design Tokens
+   ============================================ */
+
+:root {
+  /* Colors - Based on wireframe palette */
+  --color-olive-green: #f6f7f2;      /* Light background color */
+  --color-secondary: #5b7d5b;        /* Secondary green color for sections and buttons */
+  --color-green-medium: #7aa874;     /* Medium green for tabs and accents */
+  --color-sage-green: #7d7d6a;       /* Sage green for content sections */
+  --color-olive-green-dark: #9aab8a; /* Darker olive green for buttons */
+  --color-white: #ffffff;
+  --color-beige: #f5f0e8;            /* Light beige for search bar */
+  --color-text-dark: #2f3e2f;        /* Dark text */
+  --color-text-light: #ffffff;       /* Light text for dark backgrounds */
+  --color-border: rgba(0, 0, 0, 0.15); /* Subtle borders */
+  
+  /* Typography */
+  --font-serif: 'Playfair Display', serif;
+  --font-sans: 'Inter', sans-serif;
+  
+  /* Spacing */
+  --spacing-xs: 0.5rem;    /* 8px */
+  --spacing-sm: 1rem;      /* 16px */
+  --spacing-md: 1.5rem;    /* 24px */
+  --spacing-lg: 2rem;     /* 32px */
+  --spacing-xl: 3rem;      /* 48px */
+  --spacing-xxl: 4rem;     /* 64px */
+  --spacing-xxxl: 6rem;    /* 96px */
+  
+  /* Border Radius */
+  --radius-sm: 8px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-xl: 40px;
+  
+  /* Shadows */
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.15);
+  
+  /* Transitions */
+  --transition-fast: 0.2s ease;
+  --transition-normal: 0.3s ease;
+  --transition-slow: 0.5s ease;
+  
+  /* Container Widths */
+  --container-width: 90%;
+  --container-max-width: 1200px;
+}

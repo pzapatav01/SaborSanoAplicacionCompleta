@@ -1,0 +1,49 @@
+<!doctype html>
+<html data-theme="light" lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light dark" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.jade.min.css"
+    />
+    <title>SaborSano</title>
+  </head>
+  <body>
+    <main class="container">
+      <h1>Contacta con nosotros</h1>
+      <form>
+        <fieldset>
+          <label>
+            Nombre
+            <input
+              name="first_name"
+              placeholder="Introduce tu nombre"
+              autocomplete="given-name"
+            />
+          </label>
+          <label>
+            Email
+            <input
+              type="email"
+              name="email"
+              placeholder="Introduce tu email"
+              autocomplete="email"
+            />
+          </label>
+          <label>
+            Descripción
+            <textarea
+              name="bio"
+              placeholder="Cuentanos lo que quieras ✨"
+              aria-label="Professional short bio"
+            ></textarea>
+          </label>
+        </fieldset>
+
+        <input type="submit" value="Enviar" />
+      </form>
+    </main>
+  </body>
+</html>

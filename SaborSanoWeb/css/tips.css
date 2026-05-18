@@ -1,0 +1,479 @@
+/* ============================================
+   TIPS PAGE - Estructura y diseño inspirado en referencia
+   Colores y tipografía del proyecto SaborSano
+   ============================================ */
+
+/* ----- Hero (imagen vegana + overlay elegante) ----- */
+.tips-hero {
+  position: relative;
+  min-height: 85vh;
+  background: var(--color-olive-green);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  padding: var(--spacing-lg) var(--spacing-md) var(--spacing-xxl);
+  overflow: hidden;
+}
+
+.tips-hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 0.45),
+      rgba(0, 0, 0, 0.55)
+    ),
+    url("https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=1600&q=80") center / cover no-repeat;
+  z-index: 0;
+}
+
+.tips-hero-container {
+  width: var(--container-width);
+  max-width: var(--container-max-width);
+  margin: 0 auto;
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+}
+
+.tips-nav {
+  align-self: stretch;
+  margin-bottom: var(--spacing-xl);
+}
+
+.tips-hero-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.tips-hero-text {
+  text-align: center;
+  max-width: 720px;
+  color: var(--color-white);
+}
+
+.tips-hero-eyebrow {
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.82);
+  margin-bottom: var(--spacing-sm);
+}
+
+.tips-hero-title-main {
+  font-family: var(--font-serif);
+  font-size: clamp(2.6rem, 5vw, 3.6rem);
+  font-weight: 600;
+  color: var(--color-white);
+  margin: 0 0 var(--spacing-md);
+  line-height: 1.2;
+}
+
+.tips-hero-subtitle {
+  font-family: var(--font-sans);
+  font-size: clamp(0.98rem, 1.6vw, 1.1rem);
+  color: rgba(255, 255, 255, 0.92);
+  line-height: 1.8;
+  margin: 0 auto var(--spacing-lg);
+  max-width: 520px;
+}
+
+.tips-hero-cta {
+  margin-top: var(--spacing-md);
+}
+
+.btn-tips-hero {
+  display: inline-block;
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--color-white);
+  padding: var(--spacing-sm) var(--spacing-xl);
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 1rem;
+  backdrop-filter: blur(6px);
+  transition: all var(--transition-fast);
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-tips-hero:hover {
+  background: var(--color-white);
+  color: var(--color-text-dark);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+/* Ondas decorativas en esquinas del hero (referencia) */
+.tips-hero-waves-corner {
+  position: absolute;
+  width: 180px;
+  height: 180px;
+  opacity: 0.35;
+  pointer-events: none;
+  z-index: 1;
+}
+.tips-hero-waves-l {
+  top: 0;
+  left: 0;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' fill='none'%3E%3Cpath d='M0 20 Q25 10 50 20 T100 25 M0 40 Q30 35 60 45 T100 50 M0 60 Q20 55 50 65 T100 70' stroke='%23dce1d8' stroke-width='1.5' fill='none'/%3E%3C/svg%3E") no-repeat;
+}
+.tips-hero-waves-r {
+  top: 0;
+  right: 0;
+  transform: scaleX(-1);
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' fill='none'%3E%3Cpath d='M0 20 Q25 10 50 20 T100 25 M0 40 Q30 35 60 45 T100 50 M0 60 Q20 55 50 65 T100 70' stroke='%23dce1d8' stroke-width='1.5' fill='none'/%3E%3C/svg%3E") no-repeat;
+}
+/* Ondas decorativas en la base del hero */
+.tips-hero-waves {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 120px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 120' fill='none'%3E%3Cpath d='M0 120L60 105C120 90 240 60 360 45C480 30 600 30 720 37.5C840 45 960 60 1080 67.5C1200 75 1320 75 1380 75L1440 75V120H1380C1320 120 1200 120 1080 120C960 120 840 120 720 120C600 120 480 120 360 120C240 120 120 120 60 120H0Z' fill='rgba(0,0,0,0.06)'/%3E%3C/svg%3E") center bottom / cover no-repeat;
+  pointer-events: none;
+}
+
+/* ----- Sección "Sobre los tips" – refactor elegante y orgánico ----- */
+.tips-about-section {
+  /* Fondo blanco y bordes suaves, como la sección de contenido de inicio */
+  background: var(--color-white);
+  padding: var(--spacing-xxxl) 0;
+  border-top: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.tips-about-container {
+  width: var(--container-width);
+  max-width: var(--container-max-width);
+  margin: 0 auto;
+  padding: 0 var(--spacing-md);
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.3fr);
+  gap: var(--spacing-xxl);
+  align-items: center;
+}
+
+.tips-about-intro {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.tips-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.9rem;
+  border-radius: 999px;
+  background: rgba(122, 168, 116, 0.16);
+  color: var(--color-secondary);
+  font-family: var(--font-sans);
+  font-size: 0.82rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.tips-about-heading {
+  font-family: var(--font-serif);
+  font-size: clamp(2rem, 3.2vw, 2.6rem);
+  font-weight: 600;
+  line-height: 1.25;
+  color: var(--color-text-dark);
+  margin: 0;
+}
+
+.tips-about-lead {
+  font-size: 1.02rem;
+  line-height: 1.8;
+  color: var(--color-text-dark);
+  max-width: 34rem;
+  margin: 0;
+}
+
+.tips-about-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-md);
+  padding: 0.6rem 1.2rem;
+  border-radius: 999px;
+  background: var(--color-olive-green);
+  box-shadow: var(--shadow-sm);
+}
+
+.tips-badge-number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.2rem;
+  height: 2.2rem;
+  border-radius: 50%;
+  background: var(--color-secondary);
+  color: var(--color-white);
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.tips-badge-text {
+  font-family: var(--font-sans);
+  font-size: 0.95rem;
+  color: var(--color-text-dark);
+}
+
+.tips-about-steps {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-md);
+}
+
+.tips-step-card {
+  position: relative;
+  padding: var(--spacing-lg) var(--spacing-lg) var(--spacing-lg) calc(var(--spacing-lg) + 2.5rem);
+  background: var(--color-olive-green);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+
+.tips-step-card::before {
+  content: "";
+  position: absolute;
+  right: -40px;
+  bottom: -40px;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: rgba(122, 168, 116, 0.18);
+}
+
+.tips-step-index {
+  position: absolute;
+  left: var(--spacing-lg);
+  top: var(--spacing-lg);
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 0.9rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--color-secondary);
+}
+
+.tips-step-title {
+  font-family: var(--font-serif);
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--color-text-dark);
+  margin: 0 0 var(--spacing-sm);
+}
+
+.tips-step-text {
+  font-size: 0.98rem;
+  line-height: 1.8;
+  color: var(--color-text-dark);
+  margin: 0;
+}
+
+/* ----- Sección "¿Por qué tips?" (fondo verde oscuro) ----- */
+.tips-why-section {
+  background: var(--color-secondary);
+  padding: var(--spacing-xxxl) 0;
+  color: var(--color-text-light);
+}
+
+.tips-why-container {
+  width: var(--container-width);
+  max-width: var(--container-max-width);
+  margin: 0 auto;
+  padding: 0 var(--spacing-md);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-xxl);
+  align-items: center;
+}
+
+.tips-why-left {
+  text-align: center;
+  padding: var(--spacing-xl) 0;
+}
+
+.tips-why-title {
+  font-family: var(--font-serif);
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 600;
+  font-style: italic;
+  color: var(--color-white);
+  margin: 0 0 var(--spacing-lg);
+}
+
+.tips-why-stat {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-md);
+}
+
+.tips-why-number {
+  font-family: var(--font-sans);
+  font-size: clamp(4rem, 10vw, 6rem);
+  font-weight: 700;
+  color: var(--color-white);
+  line-height: 1;
+}
+
+.tips-why-icon {
+  font-size: 2.5rem;
+  line-height: 1;
+}
+
+.tips-why-text {
+  font-size: 1rem;
+  line-height: 1.7;
+  color: rgba(255, 255, 255, 0.95);
+  max-width: 380px;
+  margin: 0 auto;
+}
+
+/* Tarjeta de beneficios – diseño cuadrado/rectangular, coherente con el resto */
+.tips-benefits-card {
+  position: relative;
+  background: var(--color-olive-green);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-xxl);
+  box-shadow: var(--shadow-sm);
+}
+
+.tips-benefits-title {
+  font-family: var(--font-serif);
+  font-size: clamp(1.5rem, 2.5vw, 2rem);
+  font-weight: 600;
+  font-style: italic;
+  color: var(--color-text-dark);
+  margin: 0 0 var(--spacing-lg);
+}
+
+/* Imagen rectangular con esquinas redondeadas */
+.tips-benefits-image {
+  width: 100%;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: var(--color-secondary);
+  margin-bottom: var(--spacing-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.tips-benefits-image img {
+  width: 100%;
+  height: auto;
+  min-height: 200px;
+  object-fit: cover;
+  display: block;
+}
+
+.tips-benefits-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 var(--spacing-lg);
+  counter-reset: tip;
+}
+
+.tips-benefits-list li {
+  counter-increment: tip;
+  font-size: 1rem;
+  line-height: 1.6;
+  color: var(--color-text-dark);
+  margin-bottom: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: var(--color-beige);
+  border-radius: var(--radius-sm);
+  position: relative;
+  padding-left: calc(var(--spacing-md) + 1.5em);
+}
+
+.tips-benefits-list li::before {
+  content: counter(tip);
+  position: absolute;
+  left: var(--spacing-sm);
+  top: 50%;
+  transform: translateY(-50%);
+  font-weight: 700;
+  color: var(--color-secondary);
+  font-size: 1rem;
+}
+
+.btn-tips-work {
+  display: inline-block;
+  background: var(--color-secondary);
+  color: var(--color-white);
+  padding: var(--spacing-sm) var(--spacing-xl);
+  border-radius: var(--radius-lg);
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 1rem;
+  transition: all var(--transition-fast);
+  box-shadow: var(--shadow-md);
+  margin-top: var(--spacing-sm);
+}
+
+.btn-tips-work:hover {
+  background: var(--color-text-dark);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+/* ----- Responsive ----- */
+@media (max-width: 900px) {
+  .tips-about-container,
+  .tips-why-container {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-xl);
+    min-height: auto;
+  }
+
+  .tips-why-left {
+    padding: 0;
+  }
+}
+
+@media (max-width: 768px) {
+  .tips-hero {
+    min-height: 75vh;
+    padding: var(--spacing-md);
+  }
+
+  .tips-hero-frame {
+    width: min(280px, 80vw);
+    height: min(280px, 80vw);
+  }
+
+  .tips-about-text-block,
+  .tips-benefits-card {
+    padding: var(--spacing-lg);
+  }
+
+  .tips-about-ugc {
+    letter-spacing: 0.15em;
+  }
+}
+
+@media (max-width: 480px) {
+  .tips-about-section,
+  .tips-why-section {
+    padding: var(--spacing-xxl) 0;
+  }
+
+  .tips-benefits-list li {
+    padding-left: calc(var(--spacing-md) + 1.8em);
+  }
+}

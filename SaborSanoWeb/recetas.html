@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Recetas - SaborSano</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="css/recetas.css">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;1,500&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <header class="recetas-hero">
+    <div class="recetas-hero-inner">
+      <nav class="nav-bar recetas-nav">
+        <div class="nav-logo">VEGAN</div>
+        <div class="nav-links">
+          <a href="indexPrueba.html">Inicio</a>
+          <a href="informacion.html">Información</a>
+          <a href="tips.html">Tips</a>
+          <a href="recetas.html">Recetas</a>
+          <a href="contacto.html">Contacto</a>
+        </div>
+      </nav>
+
+      <div class="recetas-hero-split">
+        <div class="recetas-hero-image">
+          <img src="https://i.pinimg.com/736x/15/9b/d4/159bd44c7b32f47a22b0881f434caa30.jpg" alt="Platos veganos frescos y saludables">
+        </div>
+        <div class="recetas-hero-content">
+          <h1 class="recetas-hero-title">Hecho con naturaleza,<br>inspirado en lo verde</h1>
+          <p class="recetas-hero-text">
+            Descubre nuestra colección de recetas veganas: texturas naturales, ingredientes frescos y sabores que celebran lo mejor de la cocina basada en plantas.
+          </p>
+          <a href="#recetas-grid" class="btn-recetas-cta">Ver recetas</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Sección 4 cards: icono, título, descripción, tonos ligeros -->
+  <section class="recetas-cards-section">
+    <div class="recetas-cards-container">
+      <article class="recetas-card recetas-card-1">
+        <div class="recetas-card-icon" aria-hidden="true">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22c0-4 4-8 12-8s12 4 12 8v14H12V22z"/><path d="M24 14v6"/></svg>
+        </div>
+        <h3 class="recetas-card-title">Desayunos</h3>
+        <p class="recetas-card-desc">Empieza el día con recetas ligeras y nutritivas: bowls, smoothies y tostadas veganas en pocos minutos.</p>
+        <span class="recetas-card-label">Ver recetas de desayuno</span>
+      </article>
+
+      <article class="recetas-card recetas-card-2">
+        <div class="recetas-card-icon" aria-hidden="true">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="24" cy="28" rx="16" ry="6"/><path d="M8 28c0-8 7-14 16-14s16 6 16 14"/><path d="M24 20v4"/></svg>
+        </div>
+        <h3 class="recetas-card-title">Comidas principales</h3>
+        <p class="recetas-card-desc">Platos únicos para el almuerzo o cena: ensaladas, bowls, guisos y preparaciones con legumbres y granos.</p>
+        <span class="recetas-card-label">Explorar platos fuertes</span>
+      </article>
+
+      <article class="recetas-card recetas-card-3">
+        <div class="recetas-card-icon" aria-hidden="true">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="24" cy="24" r="14"/><path d="M24 12v12l8 4"/></svg>
+        </div>
+        <h3 class="recetas-card-title">Rápidas</h3>
+        <p class="recetas-card-desc">Recetas de menos de 30 minutos para cuando tienes poco tiempo sin renunciar al sabor ni a lo saludable.</p>
+        <span class="recetas-card-label">Recetas express</span>
+      </article>
+
+      <article class="recetas-card recetas-card-4">
+        <div class="recetas-card-icon" aria-hidden="true">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M24 38c-6-4-12-4-12-12 0-6 4-10 12-16 8 6 12 10 12 16 0 8-6 8-12 12z"/></svg>
+        </div>
+        <h3 class="recetas-card-title">Snacks y postres</h3>
+        <p class="recetas-card-desc">Bocadillos, galletas y dulces 100% vegetales para disfrutar entre horas o como broche final.</p>
+        <span class="recetas-card-label">Ver snacks y postres</span>
+      </article>
+    </div>
+  </section>
+
+  <section class="recetas-grid-section" id="recetas-grid">
+    <div class="recetas-container">
+      <h2 class="recetas-section-title">Recetas destacadas</h2>
+      <p class="recetas-section-lead">Elige por dónde quieres empezar a probar nuevos sabores.</p>
+
+      <div class="recetas-grid">
+        <article class="receta-card">
+          <div class="receta-card-image">
+            <img src="https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=800&h=600&fit=crop" alt="Bowl verde de quinoa con vegetales frescos">
+          </div>
+          <div class="receta-card-body">
+            <h3 class="receta-card-title">Bowl verde de quinoa</h3>
+            <p class="receta-card-meta">25 min · Alto en proteína</p>
+            <a href="#" class="btn-receta-card">Ver receta</a>
+          </div>
+        </article>
+
+        <article class="receta-card">
+          <div class="receta-card-image">
+            <img src="https://images.unsplash.com/photo-1528715471579-d1bcf0ba5e83?w=800&h=600&fit=crop" alt="Tacos veganos de garbanzo y verduras">
+          </div>
+          <div class="receta-card-body">
+            <h3 class="receta-card-title">Tacos de garbanzo</h3>
+            <p class="receta-card-meta">30 min · Ideal para compartir</p>
+            <a href="#" class="btn-receta-card">Ver receta</a>
+          </div>
+        </article>
+
+        <article class="receta-card">
+          <div class="receta-card-image">
+            <img src="https://images.unsplash.com/photo-1467003909585-2f8a72700288?w=800&h=600&fit=crop" alt="Pasta cremosa vegana con verduras verdes">
+          </div>
+          <div class="receta-card-body">
+            <h3 class="receta-card-title">Pasta cremosa vegana</h3>
+            <p class="receta-card-meta">20 min · Con salsa de anacardos</p>
+            <a href="#" class="btn-receta-card">Ver receta</a>
+          </div>
+        </article>
+
+        <article class="receta-card">
+          <div class="receta-card-image">
+            <img src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=800&h=600&fit=crop" alt="Ensalada templada de verduras asadas">
+          </div>
+          <div class="receta-card-body">
+            <h3 class="receta-card-title">Ensalada templada</h3>
+            <p class="receta-card-meta">15 min · Ligera y reconfortante</p>
+            <a href="#" class="btn-receta-card">Ver receta</a>
+          </div>
+        </article>
+
+        <article class="receta-card">
+          <div class="receta-card-image">
+            <img src="https://images.unsplash.com/photo-1511690656952-34342bb7c2f2?w=800&h=600&fit=crop" alt="Curry suave de lentejas con arroz">
+          </div>
+          <div class="receta-card-body">
+            <h3 class="receta-card-title">Curry suave de lentejas</h3>
+            <p class="receta-card-meta">35 min · Sabores especiados</p>
+            <a href="#" class="btn-receta-card">Ver receta</a>
+          </div>
+        </article>
+
+        <article class="receta-card">
+          <div class="receta-card-image">
+            <img src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=800&h=600&fit=crop" alt="Wraps frescos con hummus y vegetales">
+          </div>
+          <div class="receta-card-body">
+            <h3 class="receta-card-title">Wraps de hummus y verde</h3>
+            <p class="receta-card-meta">15 min · Perfectos para llevar</p>
+            <a href="#" class="btn-receta-card">Ver receta</a>
+          </div>
+        </article>
+
+        <article class="receta-card">
+          <div class="receta-card-image">
+            <img src="https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=800&h=600&fit=crop" alt="Sopa cremosa de calabaza vegana">
+          </div>
+          <div class="receta-card-body">
+            <h3 class="receta-card-title">Crema de calabaza</h3>
+            <p class="receta-card-meta">30 min · Ideal para noches frías</p>
+            <a href="#" class="btn-receta-card">Ver receta</a>
+          </div>
+        </article>
+
+        <article class="receta-card">
+          <div class="receta-card-image">
+            <img src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=800&h=600&fit=crop" alt="Hamburguesas veganas caseras">
+          </div>
+          <div class="receta-card-body">
+            <h3 class="receta-card-title">Hamburguesas veganas caseras</h3>
+            <p class="receta-card-meta">40 min · Para toda la familia</p>
+            <a href="#" class="btn-receta-card">Ver receta</a>
+          </div>
+        </article>
+
+        <article class="receta-card">
+          <div class="receta-card-image">
+            <img src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=800&h=600&fit=crop" alt="Tostadas con crema de frutos secos y frutas">
+          </div>
+          <div class="receta-card-body">
+            <h3 class="receta-card-title">Tostadas energéticas</h3>
+            <p class="receta-card-meta">10 min · Desayuno o snack</p>
+            <a href="#" class="btn-receta-card">Ver receta</a>
+          </div>
+        </article>
+
+        <article class="receta-card">
+          <div class="receta-card-image">
+            <img src="https://images.unsplash.com/photo-1484980972926-edee96e0960d?w=800&h=600&fit=crop" alt="Brownies veganos de chocolate">
+          </div>
+          <div class="receta-card-body">
+            <h3 class="receta-card-title">Brownies veganos</h3>
+            <p class="receta-card-meta">35 min · Dulce sin lácteos</p>
+            <a href="#" class="btn-receta-card">Ver receta</a>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+</body>
+</html>

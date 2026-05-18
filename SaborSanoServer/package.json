@@ -1,0 +1,33 @@
+{
+  "name": "server-paloma",
+  "version": "1.0.0",
+  "description": "API REST server with Express and MySQL",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js",
+    "seed": "node scripts/seedData.js",
+    "seed:metodos-pago": "node scripts/seedMetodosPago.js"
+  },
+  "keywords": [
+    "express",
+    "mysql",
+    "api",
+    "rest"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "morgan": "^1.10.0",
+    "mysql2": "^3.6.5",
+    "node-cron": "^4.2.1",
+    "sequelize": "^6.35.2",
+    "stripe": "^22.1.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  }
+}
