@@ -1,3 +1,4 @@
+const path = require('path');
 const express = require('express');
 const cors = require('cors');
 const morgan = require('morgan');
@@ -26,6 +27,9 @@ app.post(
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Archivos estáticos públicos (avatares): http://host:PORT/public/avatars/...
+app.use('/public', express.static(path.join(__dirname, 'public')));
+
 // Rutas
 app.use('/api', routes);
 
@@ -48,6 +52,7 @@ const startServer = async () => {
     app.listen(PORT, () => {
       console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`);
       console.log(`📡 API disponible en http://localhost:${PORT}/api`);
+      console.log(`🖼️  Archivos públicos en http://localhost:${PORT}/public`);
       console.log(`🌍 Entorno: ${process.env.NODE_ENV || 'development'}`);
     });
   } catch (error) {

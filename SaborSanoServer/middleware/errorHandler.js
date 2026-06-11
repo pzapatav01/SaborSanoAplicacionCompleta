@@ -40,6 +40,13 @@ const errorHandler = (err, req, res, next) => {
   }
 
   // Error genérico del servidor
+  if (err.code === 'LIMIT_FILE_SIZE') {
+    return res.status(400).json({
+      success: false,
+      message: 'La imagen excede el tamaño máximo permitido (2 MB)',
+    });
+  }
+
   res.status(err.status || 500).json({
     success: false,
     message: err.message || 'Error interno del servidor',

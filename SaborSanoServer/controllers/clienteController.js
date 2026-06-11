@@ -1,4 +1,10 @@
 const { Cliente } = require('../models');
+const {
+  hashPassword,
+  verifyPassword,
+  validatePasswordStrength,
+} = require('../utils/password');
+const { toAvatarDbPath, cleanupUploadedFile } = require('../utils/avatar');
 
 const DNI_LETTERS = 'TRWAGMYFPDXBNJZSQVHLCKE';
 const DNI_TOTAL_LENGTH = 9;
@@ -29,6 +35,18 @@ const DNI_VALIDATION_MESSAGE =
 
 const isValidEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(email).trim());
 
+const normalizeEmail = (email) => String(email).trim().toLowerCase();
+
+const toClientePublic = (cliente) => ({
+  idCliente: cliente.idCliente,
+  nombre: cliente.nombre,
+  dni: cliente.dni,
+  telefono: cliente.telefono,
+  email: cliente.email,
+  direccion: cliente.direccion,
+  avatar: cliente.avatar || null,
+});
+
 // Función para generar un ID único de cliente
 const generarIdCliente = async () => {
   let idCliente;
@@ -56,53 +74,70 @@ const generarIdCliente = async () => {
   return idCliente;
 };
 
-// Crear un nuevo cliente
+// Crear un nuevo cliente (multipart opcional con campo avatar)
 const createCliente = async (req, res, next) => {
   try {
-    const { nombre, dni, telefono, email, direccion } = req.body;
+    const { nombre, dni, telefono, email, direccion, password } = req.body;
+
+    const fail = (status, payload) => {
+      cleanupUploadedFile(req.file);
+      return res.status(status).json(payload);
+    };
 
     // Validar campos requeridos
-    if (!nombre || !dni || !telefono || !email || !direccion) {
-      return res.status(400).json({
+    if (!nombre || !dni || !telefono || !email || !direccion || !password) {
+      return fail(400, {
         success: false,
         message: 'Todos los campos son requeridos',
-        required: ['nombre', 'dni', 'telefono', 'email', 'direccion']
+        required: ['nombre', 'dni', 'telefono', 'email', 'direccion', 'password']
+      });
+    }
+
+    const passwordError = validatePasswordStrength(password);
+    if (passwordError) {
+      return fail(400, {
+        success: false,
+        message: passwordError,
+        field: 'password',
       });
     }
 
     if (!isValidEmail(email)) {
-      return res.status(400).json({
+      return fail(400, {
         success: false,
         message: 'El formato del email no es válido'
       });
     }
 
     if (!isValidSpanishDni(dni)) {
-      return res.status(400).json({
+      return fail(400, {
         success: false,
         message: DNI_VALIDATION_MESSAGE
       });
     }
 
-    // Generar ID único para el cliente
     const idCliente = await generarIdCliente();
+    const passwordHash = await hashPassword(password);
+    const avatarPath = req.file ? toAvatarDbPath(req.file.filename) : null;
 
-    // Crear el cliente
     const cliente = await Cliente.create({
       idCliente,
       nombre,
       dni: normalizeDni(dni),
       telefono,
-      email,
-      direccion
+      email: normalizeEmail(email),
+      direccion,
+      password: passwordHash,
+      avatar: avatarPath,
     });
 
     res.status(201).json({
       success: true,
       message: 'Cliente registrado correctamente',
-      data: cliente
+      data: toClientePublic(cliente),
     });
   } catch (error) {
+    cleanupUploadedFile(req.file);
     // Manejar errores de duplicados (dni o email únicos)
     if (error.name === 'SequelizeUniqueConstraintError') {
       const field = error.errors[0].path;
@@ -129,25 +164,66 @@ const createCliente = async (req, res, next) => {
   }
 };
 
+// Iniciar sesión con email y contraseña
+const loginCliente = async (req, res, next) => {
+  try {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+      return res.status(400).json({
+        success: false,
+        message: 'Email y contraseña son requeridos',
+        required: ['email', 'password'],
+      });
+    }
+
+    if (!isValidEmail(email)) {
+      return res.status(400).json({
+        success: false,
+        message: 'El formato del email no es válido',
+      });
+    }
+
+    const cliente = await Cliente.scope('withPassword').findOne({
+      where: { email: normalizeEmail(email) },
+    });
+
+    if (!cliente || !cliente.password) {
+      return res.status(401).json({
+        success: false,
+        message: 'Email o contraseña incorrectos',
+        code: 'INVALID_CREDENTIALS',
+      });
+    }
+
+    const passwordMatches = await verifyPassword(password, cliente.password);
+    if (!passwordMatches) {
+      return res.status(401).json({
+        success: false,
+        message: 'Email o contraseña incorrectos',
+        code: 'INVALID_CREDENTIALS',
+      });
+    }
+
+    res.json({
+      success: true,
+      message: 'Sesión iniciada correctamente',
+      data: toClientePublic(cliente),
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 // Obtener perfil del cliente autenticado
 const getMiPerfil = async (req, res, next) => {
   try {
     // El cliente ya está en req.cliente gracias al middleware authenticate
     const cliente = req.cliente;
 
-    // Excluir información sensible si es necesario (aunque en este caso no hay contraseñas)
-    const clienteData = {
-      idCliente: cliente.idCliente,
-      nombre: cliente.nombre,
-      dni: cliente.dni,
-      telefono: cliente.telefono,
-      email: cliente.email,
-      direccion: cliente.direccion
-    };
-
     res.json({
       success: true,
-      data: clienteData
+      data: toClientePublic(cliente),
     });
   } catch (error) {
     next(error);
@@ -186,21 +262,14 @@ const updateMiPerfil = async (req, res, next) => {
       nombre,
       dni: normalizeDni(dni),
       telefono,
-      email,
-      direccion
+      email: normalizeEmail(email),
+      direccion,
     });
 
     res.json({
       success: true,
       message: 'Perfil actualizado correctamente',
-      data: {
-        idCliente: cliente.idCliente,
-        nombre: cliente.nombre,
-        dni: cliente.dni,
-        telefono: cliente.telefono,
-        email: cliente.email,
-        direccion: cliente.direccion
-      }
+      data: toClientePublic(cliente),
     });
   } catch (error) {
     if (error.name === 'SequelizeUniqueConstraintError') {
@@ -227,6 +296,7 @@ const updateMiPerfil = async (req, res, next) => {
 
 module.exports = {
   createCliente,
+  loginCliente,
   getMiPerfil,
-  updateMiPerfil
+  updateMiPerfil,
 };

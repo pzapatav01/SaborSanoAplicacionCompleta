@@ -21,12 +21,7 @@ class MainLayout extends StatefulWidget {
     this.showBottomNav = true,
     this.currentNavIndex = 0,
     this.onNavTap,
-    this.searchHint = 'Explorar productos',
-    this.showSearchBar = true,
-    this.showFilterButton = true,
-    this.onSearchTap,
     this.onCartTap,
-    this.onFilterTap,
     this.menuCategories = const [],
     this.onMenuCategoryTap,
   });
@@ -35,12 +30,7 @@ class MainLayout extends StatefulWidget {
   final bool showBottomNav;
   final int currentNavIndex;
   final ValueChanged<int>? onNavTap;
-  final String searchHint;
-  final bool showSearchBar;
-  final bool showFilterButton;
-  final VoidCallback? onSearchTap;
   final VoidCallback? onCartTap;
-  final VoidCallback? onFilterTap;
   final List<MenuCategoryItem> menuCategories;
   final ValueChanged<String>? onMenuCategoryTap;
 
@@ -50,6 +40,8 @@ class MainLayout extends StatefulWidget {
 
 class _MainLayoutState extends State<MainLayout> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  final GlobalKey<AppBottomNavBarState> _bottomNavKey =
+      GlobalKey<AppBottomNavBarState>();
   List<MenuCategoryItem> _dynamicCategories = const [];
   bool _loadingCategories = false;
   String? _categoriesError;
@@ -60,6 +52,12 @@ class _MainLayoutState extends State<MainLayout> {
     if (widget.menuCategories.isEmpty) {
       _loadCategories();
     }
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _bottomNavKey.currentState?.refreshSession();
   }
 
   Future<void> _loadCategories() async {
@@ -102,7 +100,6 @@ class _MainLayoutState extends State<MainLayout> {
 
   @override
   Widget build(BuildContext context) {
-    final bool showFilter = widget.showFilterButton;
     final void Function() openDrawer = () {
       _scaffoldKey.currentState?.openDrawer();
     };
@@ -113,17 +110,13 @@ class _MainLayoutState extends State<MainLayout> {
       body: Column(
         children: [
           AppTopBar(
-            searchHint: widget.searchHint,
-            showSearchBar: widget.showSearchBar,
-            showFilterButton: showFilter,
-            onSearchTap: widget.onSearchTap,
             onCartTap: widget.onCartTap,
             onMenuTap: openDrawer,
-            onFilterTap: widget.onFilterTap,
           ),
           Expanded(child: widget.body),
           if (widget.showBottomNav)
             AppBottomNavBar(
+              key: _bottomNavKey,
               currentIndex: widget.currentNavIndex,
               onTap: widget.onNavTap,
             ),

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+
+import '../services/client_session.dart';
 import '../theme/app_theme.dart';
 
 /// Ítem reutilizable del bottom nav: icono + label, con estado activo (fondo verde lima).
@@ -58,8 +60,8 @@ class NavButton extends StatelessWidget {
   }
 }
 
-/// Barra de navegación inferior con 3 opciones: Inicio, Carrito, Perfil.
-class AppBottomNavBar extends StatelessWidget {
+/// Barra inferior: Inicio, Carrito y Perfil (con sesión) o Login (sin sesión).
+class AppBottomNavBar extends StatefulWidget {
   const AppBottomNavBar({
     super.key,
     this.currentIndex = 0,
@@ -70,7 +72,35 @@ class AppBottomNavBar extends StatelessWidget {
   final ValueChanged<int>? onTap;
 
   @override
+  State<AppBottomNavBar> createState() => AppBottomNavBarState();
+}
+
+class AppBottomNavBarState extends State<AppBottomNavBar> {
+  bool _hasSession = false;
+  bool _loadingSession = true;
+
+  @override
+  void initState() {
+    super.initState();
+    refreshSession();
+  }
+
+  Future<void> refreshSession() async {
+    final profile = await ClientSession.get();
+    if (!mounted) return;
+    setState(() {
+      _hasSession =
+          profile != null && profile.idCliente.trim().isNotEmpty;
+      _loadingSession = false;
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final thirdLabel = _hasSession ? 'Perfil' : 'Login';
+    final thirdIcon =
+        _hasSession ? Icons.person_outline : Icons.login_rounded;
+
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -91,20 +121,20 @@ class AppBottomNavBar extends StatelessWidget {
               NavButton(
                 icon: Icons.home_rounded,
                 label: 'Inicio',
-                isActive: currentIndex == 0,
-                onTap: () => onTap?.call(0),
+                isActive: widget.currentIndex == 0,
+                onTap: () => widget.onTap?.call(0),
               ),
               NavButton(
                 icon: Icons.shopping_cart_outlined,
                 label: 'Carrito',
-                isActive: currentIndex == 1,
-                onTap: () => onTap?.call(1),
+                isActive: widget.currentIndex == 1,
+                onTap: () => widget.onTap?.call(1),
               ),
               NavButton(
-                icon: Icons.person_outline,
-                label: 'Perfil',
-                isActive: currentIndex == 2,
-                onTap: () => onTap?.call(2),
+                icon: thirdIcon,
+                label: _loadingSession ? '...' : thirdLabel,
+                isActive: widget.currentIndex == 2,
+                onTap: () => widget.onTap?.call(2),
               ),
             ],
           ),

@@ -27,3 +27,7 @@ Thumbs.db
 # Build
 dist/
 build/
+
+# Avatares subidos (demo local)
+public/avatars/*
+!public/avatars/.gitkeep

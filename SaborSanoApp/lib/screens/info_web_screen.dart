@@ -3,7 +3,7 @@ import 'package:webview_flutter/webview_flutter.dart';
 import '../theme/app_theme.dart';
 
 /// URL para la sección Información del menú. Cámbiala por tu enlace real.
-const String kInfoUrl = 'https://ejemplo.com/informacion';
+const String kInfoUrl = 'https://pzapatav01.github.io/Solo_SaborSano_Web/informacion.html';
 
 /// Pantalla que muestra una URL en WebView (para el ítem Información del menú).
 class InfoWebScreen extends StatefulWidget {

@@ -6,6 +6,7 @@ import '../services/products_repository.dart';
 import '../services/reviews_repository.dart';
 import '../services/client_session.dart';
 import '../layouts/main_layout.dart';
+import '../utils/bottom_nav_actions.dart';
 import 'info_web_screen.dart';
 
 /// Pantalla de detalle del producto: datos, cantidad y agregar al carrito (persistido local).
@@ -16,11 +17,13 @@ class ProductDetailScreen extends StatefulWidget {
     this.productId,
     this.productName,
     this.productPrice,
+    this.productImageUrl,
   });
 
   final String? productId;
   final String? productName;
   final String? productPrice;
+  final String? productImageUrl;
 
   @override
   State<ProductDetailScreen> createState() => _ProductDetailScreenState();
@@ -42,6 +45,14 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       _product?.name ?? widget.productName?.trim() ?? 'Producto';
   String get _price =>
       _product?.formattedPrice ?? widget.productPrice?.trim() ?? '\$0.00';
+
+  String? get _imageUrl {
+    final fromApi = _product?.imageUrl?.trim();
+    if (fromApi != null && fromApi.isNotEmpty) return fromApi;
+    final fromNav = widget.productImageUrl?.trim();
+    if (fromNav != null && fromNav.isNotEmpty) return fromNav;
+    return null;
+  }
 
   @override
   void initState() {
@@ -196,7 +207,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         Navigator.of(context).pushNamed('/cart');
         break;
       case 2:
-        Navigator.of(context).pushNamed('/orders');
+        BottomNavActions.goToProfileOrLogin(context);
         break;
     }
   }
@@ -222,8 +233,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   Widget build(BuildContext context) {
     return MainLayout(
       showBottomNav: true,
-      showSearchBar: false,
-      showFilterButton: false,
       currentNavIndex: 0,
       onNavTap: _onNavTap,
       onCartTap: () => Navigator.of(context).pushNamed('/cart'),
@@ -275,11 +284,22 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                   ],
                 ),
                 clipBehavior: Clip.antiAlias,
-                child: (_product?.imageUrl != null &&
-                        _product!.imageUrl!.isNotEmpty)
+                child: _imageUrl != null
                     ? Image.network(
-                        _product!.imageUrl!,
+                        _imageUrl!,
                         fit: BoxFit.cover,
+                        loadingBuilder: (context, child, progress) {
+                          if (progress == null) return child;
+                          return Center(
+                            child: CircularProgressIndicator(
+                              color: AppTheme.accentLime,
+                              value: progress.expectedTotalBytes != null
+                                  ? progress.cumulativeBytesLoaded /
+                                      progress.expectedTotalBytes!
+                                  : null,
+                            ),
+                          );
+                        },
                         errorBuilder: (_, __, ___) => Center(
                           child: Icon(
                             Icons.image_outlined,

@@ -49,27 +49,51 @@ class OrdersRepository {
         .toList();
   }
 
-  /// Envía el pedido al backend al finalizar la compra (crea Pedido + Detalles).
-  static Future<void> createOrder(Order order) async {
+  /// Envía el pedido al backend y devuelve el [idPedido] creado.
+  static Future<String> createOrderFromCart(List<CartItem> items) async {
     final profile = await ClientSession.get();
     if (profile == null || profile.idCliente.trim().isEmpty) {
       throw Exception('No hay cliente para asociar el pedido');
     }
 
-    final detalles = order.items
+    if (items.isEmpty) {
+      throw Exception('El carrito está vacío');
+    }
+
+    final detalles = items
         .map((item) => {
               'idProducto': item.id,
               'cantidad': item.quantity,
             })
         .toList();
 
-    await _client.postJson(
+    final response = await _client.postJson(
       _createOrderPath,
       body: {
         'idCliente': profile.idCliente,
         'detalles': detalles,
       },
     );
+
+    if (response['success'] != true) {
+      final message =
+          response['message'] as String? ?? 'No se pudo crear el pedido';
+      throw Exception(message);
+    }
+
+    final data = response['data'];
+    if (data is Map<String, dynamic>) {
+      final id = (data['idPedido'] ?? '').toString();
+      if (id.isNotEmpty) return id;
+    }
+
+    throw Exception('El servidor no devolvió idPedido');
+  }
+
+  /// Envía el pedido al backend al finalizar la compra (crea Pedido + Detalles).
+  @Deprecated('Usa createOrderFromCart para obtener el idPedido real')
+  static Future<void> createOrder(Order order) async {
+    await createOrderFromCart(order.items);
   }
 
   /// Convierte la estructura compleja del backend a nuestro modelo [Order].

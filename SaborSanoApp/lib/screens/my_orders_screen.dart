@@ -84,6 +84,37 @@ class _MyOrdersScreenState extends State<MyOrdersScreen>
     }
   }
 
+  Future<void> _logout() async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: const Text('Cerrar sesión'),
+        content: const Text('¿Seguro que deseas salir de tu cuenta?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: const Text('Cancelar'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            style: FilledButton.styleFrom(
+              backgroundColor: AppTheme.accentLimeDark,
+            ),
+            child: const Text('Cerrar sesión'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm != true || !mounted) return;
+
+    await ClientSession.clear();
+
+    if (!mounted) return;
+    Navigator.of(context).pushNamedAndRemoveUntil('/', (route) => false);
+  }
+
   void _onMenuCategoryTap(BuildContext context, String categoryId) {
     switch (categoryId) {
       case 'inicio':
@@ -105,8 +136,6 @@ class _MyOrdersScreenState extends State<MyOrdersScreen>
   Widget build(BuildContext context) {
     return MainLayout(
       showBottomNav: true,
-      showSearchBar: false,
-      showFilterButton: false,
       currentNavIndex: 2,
       onNavTap: _onNavTap,
       onCartTap: () => Navigator.of(context).pushNamed('/cart'),
@@ -115,22 +144,33 @@ class _MyOrdersScreenState extends State<MyOrdersScreen>
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Padding(
-            padding: const EdgeInsets.fromLTRB(8, 8, 16, 0),
-            child: Align(
-              alignment: Alignment.centerLeft,
-              child: IconButton(
-                icon: const Icon(Icons.arrow_back_rounded),
-                style: IconButton.styleFrom(
-                  foregroundColor: AppTheme.textPrimary,
+            padding: const EdgeInsets.fromLTRB(8, 12, 16, 0),
+            child: Row(
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.arrow_back_rounded),
+                  onPressed: () {
+                    if (Navigator.of(context).canPop()) {
+                      Navigator.of(context).pop();
+                    } else {
+                      Navigator.of(context).popUntil((route) => route.isFirst);
+                    }
+                  },
+                  style: IconButton.styleFrom(
+                    foregroundColor: AppTheme.textPrimary,
+                  ),
                 ),
-                onPressed: () {
-                  if (Navigator.of(context).canPop()) {
-                    Navigator.of(context).pop();
-                  } else {
-                    Navigator.of(context).popUntil((route) => route.isFirst);
-                  }
-                },
-              ),
+                const SizedBox(width: 4),
+                Expanded(
+                  child: Text(
+                    'Mi perfil',
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: AppTheme.textPrimary,
+                        ),
+                  ),
+                ),
+              ],
             ),
           ),
           _UserSummaryHeader(profile: _profile, loading: _loadingProfile),
@@ -157,7 +197,20 @@ class _MyOrdersScreenState extends State<MyOrdersScreen>
                     arguments: order.id,
                   ),
                 ),
-                _MyDataTab(profile: _profile, loading: _loadingProfile),
+                _MyDataTab(
+                  profile: _profile,
+                  loading: _loadingProfile,
+                  onEdit: () async {
+                    final updated = await Navigator.of(context).pushNamed(
+                      '/register',
+                      arguments: {'edit': true},
+                    );
+                    if (updated == true) {
+                      _loadProfile();
+                    }
+                  },
+                  onLogout: _logout,
+                ),
               ],
             ),
           ),
@@ -176,38 +229,60 @@ class _UserSummaryHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final avatarUrl = profile?.avatarUrl;
+
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 16, 20, 12),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Text(
-            profile?.nombre.isNotEmpty == true ? profile!.nombre : 'Mi cuenta',
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: AppTheme.textPrimary,
-                ),
+          CircleAvatar(
+            radius: 28,
+            backgroundColor: AppTheme.accentLime.withOpacity(0.15),
+            backgroundImage:
+                avatarUrl != null ? NetworkImage(avatarUrl) : null,
+            onBackgroundImageError: avatarUrl != null ? (_, __) {} : null,
+            child: avatarUrl == null
+                ? Icon(Icons.person_outline, color: AppTheme.accentLimeDark)
+                : null,
           ),
-          const SizedBox(height: 4),
-          if (loading)
-            const LinearProgressIndicator(
-              minHeight: 2,
-              color: AppTheme.accentLime,
-            )
-          else if (profile != null)
-            Text(
-              profile!.email,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: AppTheme.textSecondary,
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  profile?.nombre.isNotEmpty == true
+                      ? profile!.nombre
+                      : 'Mi cuenta',
+                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: AppTheme.textPrimary,
+                      ),
+                ),
+                const SizedBox(height: 4),
+                if (loading)
+                  const LinearProgressIndicator(
+                    minHeight: 2,
+                    color: AppTheme.accentLime,
+                  )
+                else if (profile != null)
+                  Text(
+                    profile!.email,
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: AppTheme.textSecondary,
+                        ),
+                  )
+                else
+                  Text(
+                    'Gestiona tus pedidos y datos.',
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: AppTheme.textSecondary,
+                        ),
                   ),
-            )
-          else
-            Text(
-              'Gestiona tus pedidos y datos.',
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: AppTheme.textSecondary,
-                  ),
+              ],
             ),
+          ),
         ],
       ),
     );
@@ -371,10 +446,17 @@ class _OrderCard extends StatelessWidget {
 }
 
 class _MyDataTab extends StatelessWidget {
-  const _MyDataTab({this.profile, required this.loading});
+  const _MyDataTab({
+    this.profile,
+    required this.loading,
+    required this.onEdit,
+    required this.onLogout,
+  });
 
   final ClientProfile? profile;
   final bool loading;
+  final VoidCallback onEdit;
+  final VoidCallback onLogout;
 
   @override
   Widget build(BuildContext context) {
@@ -406,12 +488,27 @@ class _MyDataTab extends StatelessWidget {
             _DataRow(label: 'Dirección', value: profile!.direccion),
             const SizedBox(height: 24),
             FilledButton.icon(
-              onPressed: () => Navigator.of(context).pushNamed('/register'),
+              onPressed: onEdit,
               icon: const Icon(Icons.edit_outlined, size: 20),
               label: const Text('Editar mis datos'),
               style: FilledButton.styleFrom(
                 backgroundColor: AppTheme.accentLime,
                 foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 24, vertical: 14),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
+            OutlinedButton.icon(
+              onPressed: onLogout,
+              icon: const Icon(Icons.logout_rounded, size: 20),
+              label: const Text('Cerrar sesión'),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: Colors.redAccent,
+                side: BorderSide(color: Colors.redAccent.withOpacity(0.5)),
                 padding: const EdgeInsets.symmetric(
                     horizontal: 24, vertical: 14),
                 shape: RoundedRectangleBorder(
@@ -453,7 +550,7 @@ class _MyDataTab extends StatelessWidget {
             ),
             const SizedBox(height: 24),
             FilledButton.icon(
-              onPressed: () => Navigator.of(context).pushNamed('/register'),
+              onPressed: onEdit,
               icon: const Icon(Icons.edit_outlined, size: 20),
               label: const Text('Ir a Mis datos'),
               style: FilledButton.styleFrom(

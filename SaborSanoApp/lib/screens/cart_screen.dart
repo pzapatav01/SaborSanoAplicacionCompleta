@@ -4,7 +4,7 @@ import '../theme/app_theme.dart';
 import '../services/cart_storage.dart';
 import '../services/orders_repository.dart';
 import '../services/client_session.dart';
-import '../services/payment_methods_repository.dart';
+import '../utils/bottom_nav_actions.dart';
 import 'info_web_screen.dart';
 
 /// Pantalla del carrito: lee y elimina ítems desde persistencia local (CartStorage).
@@ -19,10 +19,7 @@ class _CartScreenState extends State<CartScreen> {
   List<CartItem> _items = [];
   bool _loading = true;
   String? _error;
-  String? _selectedPaymentId;
   bool _isFinishing = false;
-  List<PaymentMethod> _paymentMethods = const [];
-  bool _loadingPayments = false;
 
   Future<void> _loadCart() async {
     setState(() {
@@ -52,22 +49,6 @@ class _CartScreenState extends State<CartScreen> {
   void initState() {
     super.initState();
     _loadCart();
-    _loadPaymentMethods();
-  }
-
-  Future<void> _loadPaymentMethods() async {
-    setState(() => _loadingPayments = true);
-    try {
-      final list = await PaymentMethodsRepository.getAll();
-      if (!mounted) return;
-      setState(() {
-        _paymentMethods = list;
-        _loadingPayments = false;
-      });
-    } catch (_) {
-      if (!mounted) return;
-      setState(() => _loadingPayments = false);
-    }
   }
 
   void _onNavTap(int index) {
@@ -78,35 +59,14 @@ class _CartScreenState extends State<CartScreen> {
       case 1:
         break;
       case 2:
-        Navigator.of(context).pushNamed('/orders');
+        BottomNavActions.goToProfileOrLogin(context);
         break;
     }
   }
 
-  String _paymentLabel() {
-    if (_selectedPaymentId == null) return '';
-    for (final m in _paymentMethods) {
-      if (m.id == _selectedPaymentId) return m.label;
-    }
-    return _selectedPaymentId!;
-  }
-
   Future<void> _finishPurchase() async {
-    if (_selectedPaymentId == null || _selectedPaymentId!.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Selecciona un método de pago'),
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
-      return;
-    }
-
-    // Validar que exista una “sesión” de cliente antes de comprar.
     final hasClient = await _ensureClientProfile();
-    if (!hasClient) {
-      return;
-    }
+    if (!hasClient) return;
 
     setState(() => _isFinishing = true);
 
@@ -114,18 +74,32 @@ class _CartScreenState extends State<CartScreen> {
       final p = double.tryParse(i.price.replaceFirst('\$', '').trim()) ?? 0;
       return sum + p * i.quantity;
     });
-    final order = Order(
-      id: 'ord_${DateTime.now().millisecondsSinceEpoch}',
-      createdAt: DateTime.now().toIso8601String(),
-      items: List.from(_items),
-      total: subtotal,
-      paymentLabel: _paymentLabel(),
-    );
-    await OrdersRepository.createOrder(order);
-    await CartStorage.clear();
-    if (!mounted) return;
-    await _showSuccessAndGoToOrders();
-    if (mounted) setState(() => _isFinishing = false);
+
+    try {
+      final orderId = await OrdersRepository.createOrderFromCart(_items);
+      await CartStorage.clear();
+      if (!mounted) return;
+
+      await Navigator.of(context).pushNamed(
+        '/checkout-payment',
+        arguments: {
+          'orderId': orderId,
+          'total': subtotal,
+        },
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            e.toString().replaceFirst('Exception: ', 'Error: '),
+          ),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    } finally {
+      if (mounted) setState(() => _isFinishing = false);
+    }
   }
 
   /// Verifica si hay un cliente registrado localmente.
@@ -152,45 +126,6 @@ class _CartScreenState extends State<CartScreen> {
       Navigator.of(context).popUntil((route) => route.isFirst);
     }
     return false;
-  }
-
-  Future<void> _showSuccessAndGoToOrders() async {
-    final navigatorContext = context;
-    showDialog<void>(
-      context: context,
-      barrierDismissible: false,
-      builder: (dialogContext) {
-        Future.delayed(const Duration(seconds: 3), () {
-          if (!navigatorContext.mounted) return;
-          Navigator.of(dialogContext).pop();
-          Navigator.of(navigatorContext).pushReplacementNamed('/orders');
-        });
-        return AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(Icons.check_circle, color: AppTheme.accentLime, size: 64),
-              const SizedBox(height: 16),
-              Text(
-                '¡Compra exitosa!',
-                style: Theme.of(navigatorContext).textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: AppTheme.textPrimary,
-                    ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'Redirigiendo a Mis pedidos en 3 segundos...',
-                style: TextStyle(fontSize: 14, color: AppTheme.textSecondary),
-                textAlign: TextAlign.center,
-              ),
-            ],
-          ),
-        );
-      },
-    );
   }
 
   void _onMenuCategoryTap(BuildContext context, String categoryId) {
@@ -220,8 +155,6 @@ class _CartScreenState extends State<CartScreen> {
 
     return MainLayout(
       showBottomNav: true,
-      showSearchBar: false,
-      showFilterButton: false,
       currentNavIndex: 1,
       onNavTap: _onNavTap,
       onCartTap: () {},
@@ -372,44 +305,6 @@ class _CartScreenState extends State<CartScreen> {
                       ],
                     ),
                     const SizedBox(height: 16),
-                    Text(
-                      'Método de pago',
-                      style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                            fontWeight: FontWeight.w600,
-                            color: AppTheme.textPrimary,
-                          ),
-                    ),
-                    const SizedBox(height: 8),
-                    if (_loadingPayments)
-                      const Padding(
-                        padding: EdgeInsets.symmetric(vertical: 8),
-                        child: LinearProgressIndicator(
-                          minHeight: 2,
-                          color: AppTheme.accentLime,
-                        ),
-                      )
-                    else
-                      DropdownButtonFormField<String>(
-                        value: _selectedPaymentId,
-                        decoration: InputDecoration(
-                          filled: true,
-                          fillColor: AppTheme.surfaceLight,
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide.none,
-                          ),
-                          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                        ),
-                        hint: const Text('Selecciona método de pago'),
-                        items: _paymentMethods
-                            .map((m) => DropdownMenuItem<String>(
-                                  value: m.id,
-                                  child: Text(m.label),
-                                ))
-                            .toList(),
-                        onChanged: (value) => setState(() => _selectedPaymentId = value),
-                      ),
-                    const SizedBox(height: 16),
                     FilledButton(
                       onPressed: _isFinishing ? null : _finishPurchase,
                       style: FilledButton.styleFrom(
@@ -420,7 +315,9 @@ class _CartScreenState extends State<CartScreen> {
                           borderRadius: BorderRadius.circular(12),
                         ),
                       ),
-                      child: Text(_isFinishing ? 'Procesando...' : 'Finalizar compra'),
+                      child: Text(
+                        _isFinishing ? 'Creando pedido...' : 'Continuar al pago',
+                      ),
                     ),
                   ],
                 ),

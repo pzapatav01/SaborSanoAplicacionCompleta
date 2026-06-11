@@ -2,6 +2,8 @@ import 'dart:convert';
 
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'api_client.dart';
+
 /// Modelo ligero del perfil de cliente guardado localmente (sesión).
 class ClientProfile {
   const ClientProfile({
@@ -11,6 +13,7 @@ class ClientProfile {
     required this.telefono,
     required this.email,
     required this.direccion,
+    this.avatar,
   });
 
   final String idCliente;
@@ -20,6 +23,12 @@ class ClientProfile {
   final String email;
   final String direccion;
 
+  /// Ruta relativa en servidor, ej: `avatars/avatar-123.jpg`
+  final String? avatar;
+
+  /// URL completa: `{host}/public/avatars/archivo.jpg`
+  String? get avatarUrl => ApiClient.buildPublicUrl(avatar);
+
   Map<String, dynamic> toJson() => {
         'idCliente': idCliente,
         'nombre': nombre,
@@ -27,9 +36,11 @@ class ClientProfile {
         'telefono': telefono,
         'email': email,
         'direccion': direccion,
+        if (avatar != null && avatar!.isNotEmpty) 'avatar': avatar,
       };
 
   factory ClientProfile.fromJson(Map<String, dynamic> json) {
+    final avatarRaw = json['avatar'];
     return ClientProfile(
       idCliente: (json['idCliente'] ?? '').toString(),
       nombre: (json['nombre'] ?? '').toString(),
@@ -37,6 +48,9 @@ class ClientProfile {
       telefono: (json['telefono'] ?? '').toString(),
       email: (json['email'] ?? '').toString(),
       direccion: (json['direccion'] ?? '').toString(),
+      avatar: avatarRaw == null || avatarRaw.toString().trim().isEmpty
+          ? null
+          : avatarRaw.toString(),
     );
   }
 }
@@ -75,4 +89,3 @@ class ClientSession {
     await prefs.remove(_key);
   }
 }
-

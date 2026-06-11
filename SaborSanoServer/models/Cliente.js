@@ -32,11 +32,30 @@ const Cliente = sequelize.define('Cliente', {
   direccion: {
     type: DataTypes.STRING(200),
     allowNull: false
+  },
+  password: {
+    type: DataTypes.STRING(255),
+    allowNull: true,
+    field: 'password'
+  },
+  avatar: {
+    type: DataTypes.STRING(255),
+    allowNull: true,
+    field: 'avatar',
+    comment: 'Ruta relativa bajo /public, ej: avatars/avatar-123.jpg',
   }
 }, {
   tableName: 'clientes',
   timestamps: false, // La tabla no tiene createdAt ni updatedAt
-  underscored: false
+  underscored: false,
+  defaultScope: {
+    attributes: { exclude: ['password'] }
+  },
+  scopes: {
+    withPassword: {
+      attributes: { include: ['password'] }
+    }
+  }
 });
 
 module.exports = Cliente;

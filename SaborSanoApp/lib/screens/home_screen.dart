@@ -1,12 +1,15 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import '../layouts/main_layout.dart';
 import '../widgets/product_section.dart';
 import '../theme/app_theme.dart';
 import '../services/products_repository.dart';
 import '../services/product_model.dart';
+import '../utils/bottom_nav_actions.dart';
 import 'info_web_screen.dart';
 
-/// Pantalla de inicio: header (sin bottom nav), bienvenida y productos por secciones con scroll horizontal.
+/// Pantalla de inicio: bienvenida, búsqueda y productos por secciones con scroll horizontal.
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -21,19 +24,49 @@ class _HomeScreenState extends State<HomeScreen> {
   bool _loading = true;
   String? _error;
 
+  final TextEditingController _searchController = TextEditingController();
+  Timer? _searchDebounce;
+  String _activeQuery = '';
+
   @override
   void initState() {
     super.initState();
     _loadProducts();
   }
 
-  Future<void> _loadProducts() async {
+  @override
+  void dispose() {
+    _searchDebounce?.cancel();
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  void _onSearchChanged(String value) {
+    _searchDebounce?.cancel();
+    _searchDebounce = Timer(const Duration(milliseconds: 450), () {
+      final q = value.trim();
+      _activeQuery = q;
+      _loadProducts(q: q.isEmpty ? null : q);
+    });
+    // Necesario para refrescar el suffixIcon (botón limpiar)
+    setState(() {});
+  }
+
+  void _clearSearch() {
+    _searchDebounce?.cancel();
+    _searchController.clear();
+    _activeQuery = '';
+    setState(() {});
+    _loadProducts();
+  }
+
+  Future<void> _loadProducts({String? q}) async {
     setState(() {
       _loading = true;
       _error = null;
     });
     try {
-      final products = await ProductsRepository.getHomeProducts();
+      final products = await ProductsRepository.getProductos(q: q ?? _activeQuery);
       if (!mounted) return;
       setState(() {
         _especial = products;
@@ -61,6 +94,19 @@ class _HomeScreenState extends State<HomeScreen> {
         .toList();
   }
 
+  void _onNavTap(int index) {
+    switch (index) {
+      case 0:
+        break;
+      case 1:
+        Navigator.of(context).pushNamed('/cart');
+        break;
+      case 2:
+        BottomNavActions.goToProfileOrLogin(context);
+        break;
+    }
+  }
+
   void _onMenuCategoryTap(BuildContext context, String categoryId) {
     switch (categoryId) {
       case 'inicio':
@@ -81,12 +127,15 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return MainLayout(
+      showBottomNav: true,
+      currentNavIndex: 0,
+      onNavTap: _onNavTap,
       onCartTap: () => Navigator.of(context).pushNamed('/cart'),
       onMenuCategoryTap: (id) => _onMenuCategoryTap(context, id),
       body: Scrollbar(
         thumbVisibility: true,
         child: RefreshIndicator(
-          onRefresh: _loadProducts,
+          onRefresh: () => _loadProducts(q: _activeQuery.isEmpty ? null : _activeQuery),
           color: AppTheme.accentLime,
           child: SingleChildScrollView(
             physics: const AlwaysScrollableScrollPhysics(),
@@ -115,6 +164,36 @@ class _HomeScreenState extends State<HomeScreen> {
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           color: AppTheme.textSecondary,
                         ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  child: TextField(
+                    controller: _searchController,
+                    onChanged: _onSearchChanged,
+                    textInputAction: TextInputAction.search,
+                    decoration: InputDecoration(
+                      hintText: 'Buscar productos...',
+                      prefixIcon: const Icon(Icons.search),
+                      suffixIcon: _searchController.text.trim().isEmpty
+                          ? null
+                          : IconButton(
+                              tooltip: 'Limpiar',
+                              onPressed: _clearSearch,
+                              icon: const Icon(Icons.close),
+                            ),
+                      filled: true,
+                      fillColor: AppTheme.surfaceCard,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide.none,
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 14,
+                        vertical: 12,
+                      ),
+                    ),
                   ),
                 ),
                 const SizedBox(height: 24),
@@ -221,7 +300,6 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
       ),
-      showBottomNav: false,
     );
   }
 }

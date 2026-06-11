@@ -41,8 +41,10 @@ class Product {
       price = 0;
     }
 
-    final imageUrl =
-        (json['imageUrl'] ?? json['imagen'] ?? json['urlImagen']) as String?;
+    final rawImage = json['imageUrl'] ?? json['imagen'] ?? json['urlImagen'];
+    final imageUrl = rawImage == null || rawImage.toString().trim().isEmpty
+        ? null
+        : rawImage.toString().trim();
 
     return Product(
       id: id,

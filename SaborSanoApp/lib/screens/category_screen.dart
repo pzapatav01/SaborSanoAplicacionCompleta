@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import '../layouts/main_layout.dart';
-import '../widgets/hero_banner.dart';
 import '../widgets/category_chips.dart';
 import '../widgets/product_section.dart';
 import '../theme/app_theme.dart';
 import '../services/products_repository.dart';
 import '../services/product_model.dart';
+import '../utils/bottom_nav_actions.dart';
 import 'info_web_screen.dart';
 
-/// Pantalla que se muestra al elegir una categoría: hero, chips, y productos por secciones con scroll horizontal.
+/// Pantalla que se muestra al elegir una categoría: chips y productos por secciones con scroll horizontal.
 class CategoryScreen extends StatefulWidget {
   const CategoryScreen({
     super.key,
@@ -123,7 +123,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
         Navigator.of(context).pushNamed('/cart');
         break;
       case 2:
-        Navigator.of(context).pushNamed('/orders');
+        BottomNavActions.goToProfileOrLogin(context);
         break;
     }
   }
@@ -149,7 +149,6 @@ class _CategoryScreenState extends State<CategoryScreen> {
   Widget build(BuildContext context) {
     return MainLayout(
       showBottomNav: true,
-      showFilterButton: false,
       currentNavIndex: 0,
       onNavTap: _onNavTap,
       onCartTap: () => Navigator.of(context).pushNamed('/cart'),
@@ -166,25 +165,6 @@ class _CategoryScreenState extends State<CategoryScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
             const SizedBox(height: 8),
-            HeroBanner(
-              title: 'Super Sale Descuento',
-              subtitle: 'Hasta ',
-              highlightText: '50%',
-              ctaLabel: 'Comprar ahora',
-              currentPage: 0,
-              pageCount: 4,
-              onCtaTap: () {},
-              useFullWidth: true,
-              imageWidget: Image.network(
-                'https://picsum.photos/seed/saborsano/600/400',
-                fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) => Container(
-                  color: AppTheme.accentLime.withOpacity(0.2),
-                  child: const Center(child: Icon(Icons.image_outlined, size: 64, color: Colors.white54)),
-                ),
-              ),
-            ),
-            const SizedBox(height: 20),
             CategoryChips(
               categories: _categories,
               selectedId: _selectedCategoryId,
